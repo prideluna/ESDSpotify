@@ -36,9 +36,10 @@ typedef struct playlist_no {
 typedef struct lplaylists_no { 
     int id;
     char nome[200];
-    playlist_no *musica;
+    playlist_no *playlist;
     struct lplaylists_no *prox;
 } lplaylists_no;
+
 
 void imprime_artistas(artista_no *head) {
     printf("Lista de artistas:\n\n");
@@ -113,7 +114,7 @@ void cria_playlist(lplaylists_no **head, musica_no *musicas) {
         ptr = strtok(NULL, " ");
     }
 
-    nova_lplaylist->musicas = nova_playlist;
+    nova_lplaylist->playlist = nova_playlist;
     nova_lplaylist->prox = *head;
     *head = nova_lplaylist;
 
@@ -236,17 +237,20 @@ artista_no *encontra_artista_por_id(artista_no *head, int id) {
 }
 
 void imprime_playlist(lplaylists_no *head, artista_no *artistas) {
-
     lplaylists_no *playlist_atual = head;
 
-
     while (playlist_atual != NULL) {
-        printf("ID: %d\n", playlist_atual->musica->id);
-        printf("Titulo: %s\n", playlist_atual->musica->titulo);
-        printf("Artista: %s\n", encontra_artista_por_id(artistas, playlist_atual->musica->id_artista)->artista->nome);
-        printf("Duracao: %02d:%02d:%02d\n", playlist_atual->musica->duracao / 3600, (playlist_atual->musica->duracao / 60) % 60, playlist_atual->musica->duracao % 60);
-        printf("\n");
-        playlist_atual = playlist_atual->prox;
+        playlist_no *musicas_playlist = playlist_atual->playlist;
+        while (musicas_playlist != NULL) {
+            printf("Playlist: %s\n", playlist_atual->nome);
+            printf("ID: %d\n", musicas_playlist->musica->id);
+            printf("Titulo: %s\n", musicas_playlist->musica->titulo);
+            printf("Artista: %s\n", encontra_artista_por_id(artistas, musicas_playlist->musica->id_artista)->artista->nome);
+            printf("Duracao: %02d:%02d:%02d\n", musicas_playlist->musica->duracao / 3600, (musicas_playlist->musica->duracao / 60) % 60, musicas_playlist->musica->duracao % 60);
+            printf("\n");
+            musicas_playlist = musicas_playlist->prox;
+        }
+        playlist_atual = playlist_atual->prox; 
     }
 }
 
@@ -270,7 +274,8 @@ void remove_musica(musica_no **head, lplaylists_no **playlists, int id_musica) {
     }
 
     // remover a música de todas as playlists em que ela participa
-    for (int i = 0; i < MAX_PLAYLISTS; i++) {
+    for (int i = 0; i < 2; i++) {
+    if(playlists[i] != NULL) {  // Adicione esta linha para verificar se a playlist é válida
         playlist_no *playlist_atual = playlists[i];
         playlist_no *playlist_anterior = NULL;
         while (playlist_atual != NULL) {
@@ -287,6 +292,8 @@ void remove_musica(musica_no **head, lplaylists_no **playlists, int id_musica) {
             playlist_atual = playlist_atual->prox;
         }
     }
+}
+
 }
 
 int main() {
@@ -338,10 +345,10 @@ int main() {
                 shuffle(playlist);
                 break;
             case 8:
-                remove_musica(&musicas, &playlist, id_musica);
+                remove_musica(&musicas, &lplaylists, id_musica);
                 break;
             case 9:
-                imprime_playlist(playlist, artistas);
+                imprime_playlist(lplaylists, artistas);
                 break;
             case 10:
                 cria_playlist(&lplaylists ,musicas);        
