@@ -250,7 +250,7 @@ void imprime_playlist(lplaylists_no *head, artista_no *artistas) {
     }
 }
 
-void remove_musica(musica_no **head, playlist_no **playlists, int id_musica) {
+void remove_musica(musica_no **head, lplaylists_no **playlists, int id_musica) {
     // remover a música da lista encadeada de músicas
     musica_no *musica_atual = *head;
     musica_no *musica_anterior = NULL;
